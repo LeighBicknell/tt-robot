@@ -10,6 +10,7 @@ class Shot extends Model
     use HasFactory;
 
     protected $fillable = [
+        'name',
         'topspin_min',
         'topspin_max',
         'backspin_min',

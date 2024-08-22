@@ -22,6 +22,7 @@ class ShotController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'name' => 'required|string|max:255',
             'topspin_min' => 'required|integer',
             'topspin_max' => 'required|integer',
             'backspin_min' => 'required|integer',
@@ -46,6 +47,7 @@ class ShotController extends Controller
     public function update(Request $request, Shot $shot)
     {
         $request->validate([
+            'name' => 'string|max:255',
             'topspin_min' => 'integer',
             'topspin_max' => 'integer',
             'backspin_min' => 'integer',
