@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { useNuxtApp } from '#app'
 
 export const useShotsStore = defineStore('shots', {
     state: () => ({
@@ -74,9 +75,12 @@ export const useShotsStore = defineStore('shots', {
                 })
                 if (!response.ok) throw new Error('Failed to delete shot')
                 this.shots = this.shots.filter(shot => shot.id !== id)
+                const { $eventBus } = useNuxtApp()
+                $eventBus.emit('shotDeleted', id) // Emit event after deletion
             } catch (error) {
                 console.error('Error deleting shot:', error)
             }
+
         },
 
         getShotsByIds(ids: number[]) {

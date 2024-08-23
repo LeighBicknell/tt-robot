@@ -17,6 +17,7 @@
         </v-card>
 
         <!-- Sequence List Component -->
+        <!--
         <v-card class="sequence-list-container">
             <v-card-title>Sequences</v-card-title>
           <SequenceList />
@@ -29,6 +30,7 @@
             New Sequence
           </v-btn>
         </v-card>
+        -->
 
         <!-- Slider Container -->
         <v-card class="slider-container">
@@ -82,6 +84,7 @@
 <script setup lang="ts">
 import { useMotorStore } from '~/stores/motorStore'
 import { useShotsStore } from '~/stores/shotsStore'
+import { useShotStatusStore } from '~/stores/shotStatusStore'
 import MotorSlider from '~/components/MotorSlider.vue'
 import SequenceList from '~/components/SequenceList.vue'
 import { ref, onMounted, onUnmounted } from 'vue'
@@ -89,6 +92,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 // Initialize Pinia store
 const motorStore = useMotorStore()
 const shotsStore = useShotsStore()
+const shotStatusStore = useShotStatusStore()
 
 // Timer reference
 const timer = ref<NodeJS.Timeout | null>(null)
@@ -105,8 +109,11 @@ const updateMotorSpeeds = () => {
 // Start the update timer
 const startUpdateTimer = () => {
   if (!timer.value) {
-    timer.value = setInterval(updateMotorSpeeds, 2000); // 2000 ms = 2 seconds
-    isStarted.value = true; // Set motors as started
+    timer.value = setInterval(() => {
+      shotStatusStore.selectRandomEnabledShot() // Randomly select enabled shot
+      updateMotorSpeeds()
+    }, 2000) // 2000 ms = 2 seconds
+    isStarted.value = true // Set motors as started
   }
 }
 
