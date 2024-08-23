@@ -1,14 +1,22 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Services\MotorServiceInterface;
 use App\Services\MotorService;
 
 class MotorController extends Controller
 {
+    protected $motorService;
+
+    public function __construct(MotorServiceInterface $motorService)
+    {
+        $this->motorService = $motorService;
+    }
+
     public function updateMotor(Request $request)
     {
-        // Get the array of motor commands from the request
         $motorCommands = $request->input();
 
         foreach ($motorCommands as $command) {
@@ -16,10 +24,8 @@ class MotorController extends Controller
             $motorId = MotorService::MotorMap[$motorName];
             $speed = $command['speed'];
 
-            // Logic to update each motor based on request parameters
-            // For example, you could use a MotorService to handle motor control
-
-            // MotorService::updateMotor($motorId, $speed, $direction);
+            // Use the injected MotorService implementation
+            $this->motorService->updateMotor($motorId, $speed);
         }
 
         return response()->json(['status' => 'success']);
