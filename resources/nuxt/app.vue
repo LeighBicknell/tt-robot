@@ -191,6 +191,10 @@ onUnmounted(() => {
     clearInterval(timer.value);
   }
 })
+
+onMounted(() => {
+  shotStatusStore.setupEventListeners()
+})
 </script>
 
 <style scoped>

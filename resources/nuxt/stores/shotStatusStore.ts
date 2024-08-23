@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { useNuxtApp } from '#app'
+import { inject } from 'vue'
 
 export const useShotStatusStore = defineStore('shotStatus', {
   state: () => ({
@@ -42,17 +43,28 @@ export const useShotStatusStore = defineStore('shotStatus', {
     },
 
     removeShot(shotId: number) {
-      this.enabledShots.delete(shotId) // Remove from enabled shots
+      // Remove from enabled shots
+      const index = this.enabledShotIds.indexOf(shotId)
+      if (index !== -1) {
+        this.enabledShotIds.splice(index, 1)
+      }
+      // Clear active shot if it's being deleted
       if (this.activeShotId === shotId) {
-        this.activeShotId = null // Clear active shot if it's being deleted
+        this.activeShotId = null;
       }
     },
+
+    setupEventListeners() {
+        // Setup event listeners when store is created
+        const { $bus } = useNuxtApp()
+        $bus.$on('shotDeleted', (id: number) => {
+          console.log('received delete event')
+          const store = useShotStatusStore()
+          store.removeShot(id)
+            console.log('Removed shot ' + id + ' from shotstatus store due to event')
+        })
+    },
+
   }
 })
 
-// Setup event listeners when store is created
-const { $eventBus } = useNuxtApp()
-$eventBus.on('shotDeleted', (id: number) => {
-  const store = useShotStatusStore()
-  store.removeShot(id)
-})

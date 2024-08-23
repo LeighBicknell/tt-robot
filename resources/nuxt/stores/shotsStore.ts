@@ -70,13 +70,16 @@ export const useShotsStore = defineStore('shots', {
 
         async deleteShot(id: number) {
             try {
+                console.log('deleteShot called')
                 const response = await fetch(`/api/shots/${id}`, {
                     method: 'DELETE',
                 })
                 if (!response.ok) throw new Error('Failed to delete shot')
                 this.shots = this.shots.filter(shot => shot.id !== id)
-                const { $eventBus } = useNuxtApp()
-                $eventBus.emit('shotDeleted', id) // Emit event after deletion
+                const { $bus } = useNuxtApp()
+                console.log('firing delete event')
+                $bus.$emit('shotDeleted', id) // Emit event after deletion
+                console.log('shotDelete event emitted')
             } catch (error) {
                 console.error('Error deleting shot:', error)
             }

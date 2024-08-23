@@ -44,7 +44,7 @@ const shotsStore = useShotsStore()
 const motorStore = useMotorStore()
 const shotStatusStore = useShotStatusStore()
 
-const selectedShotId = compused(() => shotStatusStore.activeShotId)
+const selectedShotId = computed(() => shotStatusStore.activeShotId)
 
 // Get a mapping of shot IDs to their enabled status
 const enabledShots = computed(() => {
