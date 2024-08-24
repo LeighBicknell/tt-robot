@@ -18,9 +18,10 @@ class MotorService implements MotorServiceInterface {
         // Ensure the motor number and speed are integers
         $motorNumber = intval($motorNumber);
         $speed = intval($speed);
+        $python = config('app.python');
 
         // Command to execute the Python script
-        $command = escapeshellcmd("python3 $scriptPath $motorNumber $speed");
+        $command = escapeshellcmd("$python $scriptPath $motorNumber $speed");
 
         // Execute the command and capture the output
         $output = shell_exec($command);
