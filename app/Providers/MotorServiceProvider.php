@@ -5,7 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Services\MotorServiceInterface;
 use App\Services\DummyMotorService;
-use App\Services\RealMotorService;
+use App\Services\MotorService;
 
 class MotorServiceProvider extends ServiceProvider
 {
