@@ -40,3 +40,4 @@ if __name__ == "__main__":
 
     controller = MotorController()
     controller.set_motor_speed(motor_number, speed)
+    print("Motor speed updated")
