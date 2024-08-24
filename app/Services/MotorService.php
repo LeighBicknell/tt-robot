@@ -28,7 +28,7 @@ class MotorService implements MotorServiceInterface {
 
         // Optionally handle the output or errors
         if ($output === null) {
-            throw new \Exception("Failed to execute Python script");
+            throw new \Exception("Failed to execute Python script: $command");
         }
 
         return $output;
