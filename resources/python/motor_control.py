@@ -64,11 +64,11 @@ class MotorController:
             # 3.c: Short delay for the pulse
             time.sleep(self.pulse_duration)
 
-            # 3.d: Set final speeds for motors 3 and 4
-            if 3 in motor_speeds:
-                self.update_motor(3, motor_speeds[3])
-            if 4 in motor_speeds:
-                self.update_motor(4, motor_speeds[4])
+        # 3.d: Set final speeds for motors 3 and 4
+        if 3 in motor_speeds:
+            self.update_motor(3, motor_speeds[3])
+        if 4 in motor_speeds:
+            self.update_motor(4, motor_speeds[4])
 
         # Step 4: Update motor 2 if it's specified
         if 2 in motor_speeds:
