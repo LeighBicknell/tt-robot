@@ -60,15 +60,17 @@ class MotorController:
                 self.update_motor(3, motor_speeds[3], use_pulse=True)
             if 4 in motor_speeds:
                 self.update_motor(4, motor_speeds[4], use_pulse=True)
-
             # 3.c: Short delay for the pulse
             time.sleep(self.pulse_duration)
 
         # 3.d: Set final speeds for motors 3 and 4
-        if 3 in motor_speeds:
-            self.update_motor(3, motor_speeds[3])
-        if 4 in motor_speeds:
-            self.update_motor(4, motor_speeds[4])
+
+        if 3 in motor_speeds or 4 in motor_speeds:
+            if 3 in motor_speeds:
+                self.update_motor(3, motor_speeds[3])
+            if 4 in motor_speeds:
+                self.update_motor(4, motor_speeds[4])
+            time.sleep(0.1)
 
         # Step 4: Update motor 2 if it's specified
         if 2 in motor_speeds:
@@ -97,10 +99,10 @@ class MotorController:
             pulse_throttle = max(min(pulse_throttle, 1.0), -1.0)
             self.motors[motor_number - 1].throttle = pulse_throttle
             print(f"Motor {motor_number} pulse throttle: {pulse_throttle * 100:.2f} diff: {throttle_difference} pulse factor: {pulse_factor}")
-
-        # Set the motor to the desired speed
-        self.motors[motor_number - 1].throttle = normalized_speed
-        print(f"Motor {motor_number} final throttle: {normalized_speed * 100:.2f}")
+        else:
+            # Set the motor to the desired speed
+            self.motors[motor_number - 1].throttle = normalized_speed
+            print(f"Motor {motor_number} final throttle: {normalized_speed * 100:.2f}")
 
 if __name__ == "__main__":
     if len(sys.argv) < 3 or len(sys.argv) % 2 != 1:
