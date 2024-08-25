@@ -5,7 +5,7 @@ import board
 import busio
 
 class MotorController:
-    def __init__(self, pulse_map=None, pulse_duration=0.3):
+    def __init__(self, pulse_map=None, pulse_duration=0.23):
         self.kit = MotorKit(i2c=busio.I2C(board.SCL, board.SDA))
         self.motors = [self.kit.motor1, self.kit.motor2, self.kit.motor3, self.kit.motor4]
         self.pulse_map = pulse_map if pulse_map is not None else self.default_pulse_map()
@@ -14,7 +14,7 @@ class MotorController:
     def default_pulse_map(self):
         return {
             'speed_up': [
-                (0.1, 0.2, 0.15),
+                (0.1, 0.2, 0.1),
                 (0.2, 0.22, 0.27),
                 (0.22, 0.24, 0.3),
                 (0.24, 0.27, 0.35),
@@ -70,7 +70,7 @@ class MotorController:
                 self.update_motor(3, motor_speeds[3])
             if 4 in motor_speeds:
                 self.update_motor(4, motor_speeds[4])
-            time.sleep(0.1)
+            #time.sleep(0.1)
 
         # Step 4: Update motor 2 if it's specified
         if 2 in motor_speeds:
