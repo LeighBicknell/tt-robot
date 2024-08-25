@@ -50,7 +50,7 @@ class MotorController:
             #    # If we're spinning up a thrower stop the feeder for a moment
             #    self.motors[1].throttle = 0
             self.motors[motor_number - 1].throttle = 0
-            time.sleep(0.3)  # Wait a bit to ensure motor has stopped
+            time.sleep(0.2)  # Wait a bit to ensure motor has stopped
 
         # Since current throttle is always 0, the difference is just the normalized speed
         throttle_difference = normalized_speed

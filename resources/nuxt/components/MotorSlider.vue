@@ -5,7 +5,6 @@
     :range="true"
     :label="formattedLabel"
     thumb-label="always"
-    step="5"
     strict
   ></v-range-slider>
 </template>

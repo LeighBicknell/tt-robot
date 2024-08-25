@@ -42,7 +42,7 @@ export const useMotorStore = defineStore('motor', {
             });
 
             // Step 3: Introduce a delay before updating the feeder motor
-            await delay(1000); // Adjust as needed.
+            //await delay(1000); // Adjust as needed.
 
             // Step 4: Update the feeder motor after delay
             const [feederMinSpeed, feederMaxSpeed] = this.motors.feeder;
