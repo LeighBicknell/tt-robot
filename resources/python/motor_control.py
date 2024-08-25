@@ -27,19 +27,12 @@ class MotorController:
                 (0.43, 0.50, 0.45),
                 (0.50, 1, 0.40),
                 # Add more ranges as needed
-            ],
-            'slow_down': [
-                (0.1, 0.2, -0.1),
-                (0.2, 0.3, -0.2),
-                (0.3, 0.4, -0.3),
-                (0.4, 0.5, -0.4),
-                # Add more ranges as needed
             ]
         }
 
-    def find_nearest_pulse(self, direction, throttle_difference):
+    def find_nearest_pulse(self, throttle_difference):
         # Find the nearest pulse value based on throttle_difference
-        for lower, upper, pulse in self.pulse_map[direction]:
+        for lower, upper, pulse in self.pulse_map['speed_up']:
             if lower <= abs(throttle_difference) < upper:
                 return pulse
         return 0  # Default pulse if no range matches
@@ -51,24 +44,19 @@ class MotorController:
         # Normalize the new speed to a value between -1.0 and 1.0
         normalized_speed = new_speed / 100.0
 
-        # Get the current throttle value of the motor
+        # Always set the current throttle to 0 before making adjustments
         self.motors[motor_number - 1].throttle = 0
-        time.sleep(0.4)
-        current_throttle = self.motors[motor_number - 1].throttle
-        print(f"Current throttle: {current_throttle}")
-        if current_throttle is None:
-            current_throttle = 0
+        time.sleep(0.4)  # Wait a bit to ensure motor has stopped
 
-        # Calculate the difference in normalized speed
-        throttle_difference = normalized_speed - current_throttle
+        # Since current throttle is always 0, the difference is just the normalized speed
+        throttle_difference = normalized_speed
 
-        # Determine the pulse direction and value based on speed change
-        if throttle_difference > 0:
-            # Speeding up
-            pulse_factor = self.find_nearest_pulse('speed_up', throttle_difference)
-        else:
-            # Slowing down
-            pulse_factor = self.find_nearest_pulse('slow_down', throttle_difference)
+        # Use the pulse map to find an appropriate pulse
+        pulse_factor = self.find_nearest_pulse(throttle_difference)
+
+        # Invert pulse for negative throttles
+        if throttle_difference < 0:
+            pulse_factor = -pulse_factor
 
         # Apply the pulse throttle
         pulse_throttle = normalized_speed + pulse_factor
@@ -93,4 +81,3 @@ if __name__ == "__main__":
 
     controller = MotorController()
     controller.set_motor_speed(motor_number, new_speed)
-
