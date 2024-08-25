@@ -1,34 +1,87 @@
 import sys
+import time
 from adafruit_motorkit import MotorKit
 import board
 import busio
 
 class MotorController:
-    def __init__(self):
+    def __init__(self, pulse_map=None, pulse_duration=0.3):
         self.kit = MotorKit(i2c=busio.I2C(board.SCL, board.SDA))
+        self.motors = [self.kit.motor1, self.kit.motor2, self.kit.motor3, self.kit.motor4]
+        self.pulse_map = pulse_map if pulse_map is not None else self.default_pulse_map()
+        self.pulse_duration = pulse_duration
 
-    def set_motor_speed(self, motor_number, speed):
-        """
-        Set the speed of the specified motor.
+    def default_pulse_map(self):
+        # Example mapping, customize based on actual testing
+        return {
+            'speed_up': [
+                (0.1, 0.2, 0.15),
+                (0.2, 0.22, 0.27),
+                (0.22, 0.24, 0.3),
+                (0.24, 0.27, 0.35),
+                (0.27, 0.30, 0.4),
+                (0.30, 0.33, 0.46),
+                (0.33, 0.35, 0.48),
+                (0.35, 0.41, 0.5),
+                (0.41, 0.45, 0.48),
+                (0.43, 0.50, 0.45),
+                (0.50, 1, 0.40),
+                # Add more ranges as needed
+            ],
+            'slow_down': [
+                (0.1, 0.2, -0.1),
+                (0.2, 0.3, -0.2),
+                (0.3, 0.4, -0.3),
+                (0.4, 0.5, -0.4),
+                # Add more ranges as needed
+            ]
+        }
 
-        :param motor_number: The motor number (1 to 4).
-        :param speed: The speed of the motor (-255 to 255).
-        """
+    def find_nearest_pulse(self, direction, throttle_difference):
+        # Find the nearest pulse value based on throttle_difference
+        for lower, upper, pulse in self.pulse_map[direction]:
+            if lower <= abs(throttle_difference) < upper:
+                return pulse
+        return 0  # Default pulse if no range matches
+
+    def set_motor_speed(self, motor_number, new_speed):
         if motor_number < 1 or motor_number > 4:
             raise ValueError("Motor number must be between 1 and 4.")
 
-        # Adjust the speed value to be between -1.0 and 1.0
-        normalized_speed = speed / 100.0
+        # Normalize the new speed to a value between -1.0 and 1.0
+        normalized_speed = new_speed / 100.0
 
-        # Assuming each motor is mapped to a specific MotorKit motor
-        if motor_number == 1:
-            self.kit.motor1.throttle = normalized_speed
-        elif motor_number == 2:
-            self.kit.motor2.throttle = normalized_speed
-        elif motor_number == 3:
-            self.kit.motor3.throttle = normalized_speed
-        elif motor_number == 4:
-            self.kit.motor4.throttle = normalized_speed
+        # Get the current throttle value of the motor
+        self.motors[motor_number - 1].throttle = 0
+        time.sleep(0.4)
+        current_throttle = self.motors[motor_number - 1].throttle
+        print(f"Current throttle: {current_throttle}")
+        if current_throttle is None:
+            current_throttle = 0
+
+        # Calculate the difference in normalized speed
+        throttle_difference = normalized_speed - current_throttle
+
+        # Determine the pulse direction and value based on speed change
+        if throttle_difference > 0:
+            # Speeding up
+            pulse_factor = self.find_nearest_pulse('speed_up', throttle_difference)
+        else:
+            # Slowing down
+            pulse_factor = self.find_nearest_pulse('slow_down', throttle_difference)
+
+        # Apply the pulse throttle
+        pulse_throttle = normalized_speed + pulse_factor
+        pulse_throttle = max(min(pulse_throttle, 1.0), -1.0)
+        self.motors[motor_number - 1].throttle = pulse_throttle
+        print(f"Motor {motor_number} pulse throttle: {self.motors[motor_number - 1].throttle * 100:.2f} diff: {throttle_difference} pulse factor: {pulse_factor}")
+
+        # Short delay for the pulse
+        time.sleep(self.pulse_duration)
+
+        # Set the motor to the desired speed
+        self.motors[motor_number - 1].throttle = normalized_speed
+        print(f"Motor {motor_number} final throttle: {self.motors[motor_number - 1].throttle * 100:.2f}")
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
@@ -36,8 +89,8 @@ if __name__ == "__main__":
         sys.exit(1)
 
     motor_number = int(sys.argv[1])
-    speed = int(sys.argv[2])
+    new_speed = int(sys.argv[2])
 
     controller = MotorController()
-    controller.set_motor_speed(motor_number, speed)
-    print("Motor speed updated")
+    controller.set_motor_speed(motor_number, new_speed)
+
