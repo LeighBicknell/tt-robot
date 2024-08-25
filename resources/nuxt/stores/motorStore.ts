@@ -14,7 +14,7 @@ export const useMotorStore = defineStore('motor', {
         async updateMotorSpeeds() {
             const motorUpdates = Object.entries(this.motors)
                 .map(([motorName, [minSpeed, maxSpeed]]) => {
-                    const speed = Math.floor(Math.random() * (maxSpeed - minSpeed + 1)) + minSpeed;
+                    let speed = Math.floor(Math.random() * (maxSpeed - minSpeed + 1)) + minSpeed;
                     // force feeder to 0
                     if (motorName = 'feeder') {
                         speed = 0
