@@ -15,10 +15,6 @@ export const useMotorStore = defineStore('motor', {
             const motorUpdates = Object.entries(this.motors)
                 .map(([motorName, [minSpeed, maxSpeed]]) => {
                     let speed = Math.floor(Math.random() * (maxSpeed - minSpeed + 1)) + minSpeed;
-                    // force feeder to 0
-                    if (motorName == 'feeder') {
-                        speed = 0
-                    }
                     return { motorName, speed };
                 });
 
@@ -29,20 +25,6 @@ export const useMotorStore = defineStore('motor', {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(motorUpdates),
-            });
-
-
-            // Step 4: Update the feeder motor after delay
-            const [feederMinSpeed, feederMaxSpeed] = this.motors.feeder;
-            const feederSpeed = Math.floor(Math.random() * (feederMaxSpeed - feederMinSpeed + 1)) + feederMinSpeed;
-
-            // Send the update for the feeder motor
-            await fetch('/api/motor/commands', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify([{ motorName: 'feeder', speed: feederSpeed }]),
             });
         },
         async stopMotors() {
