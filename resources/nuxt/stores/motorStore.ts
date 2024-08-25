@@ -16,7 +16,7 @@ export const useMotorStore = defineStore('motor', {
                 .map(([motorName, [minSpeed, maxSpeed]]) => {
                     let speed = Math.floor(Math.random() * (maxSpeed - minSpeed + 1)) + minSpeed;
                     // force feeder to 0
-                    if (motorName = 'feeder') {
+                    if (motorName == 'feeder') {
                         speed = 0
                     }
                     return { motorName, speed };
