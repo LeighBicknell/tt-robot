@@ -45,7 +45,7 @@ class MotorController:
         normalized_speed = new_speed / 100.0
 
         # Always set the current throttle to 0 before making adjustments
-        if motor_number > 2:
+        if motor_number > 2 and normalized_speed != 0:
             #if normalized_speed != 0:
             #    # If we're spinning up a thrower stop the feeder for a moment
             #    self.motors[1].throttle = 0
@@ -65,7 +65,7 @@ class MotorController:
         # Apply the pulse throttle
         pulse_throttle = normalized_speed + pulse_factor
         pulse_throttle = max(min(pulse_throttle, 1.0), -1.0)
-        if motor_number > 2:
+        if motor_number > 2 and normalized_speed != 0:
             self.motors[motor_number - 1].throttle = pulse_throttle
             print(f"Motor {motor_number} pulse throttle: {self.motors[motor_number - 1].throttle * 100:.2f} diff: {throttle_difference} pulse factor: {pulse_factor}")
 
