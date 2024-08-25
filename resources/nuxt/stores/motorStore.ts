@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+import { defineStore } from 'pinia';
 
 export const useMotorStore = defineStore('motor', {
     state: () => ({
@@ -12,19 +12,49 @@ export const useMotorStore = defineStore('motor', {
     }),
     actions: {
         async updateMotorSpeeds() {
-            // Generate random speeds for each motor
-            const motorUpdates = Object.entries(this.motors).map(([motorName, [minSpeed, maxSpeed]]) => {
-                const speed = Math.floor(Math.random() * (maxSpeed - minSpeed + 1)) + minSpeed;
-                return { motorName, speed };
+            // Helper function to introduce a delay
+            const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+            // Step 1: Stop the feeder motor
+            await fetch('/api/motor/commands', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify([{ motorName: 'feeder', speed: 0 }]),
             });
 
-            // Send the motor updates to the server
+            // Step 2: Update the speeds for other motors
+            const motorUpdates = Object.entries(this.motors)
+                .filter(([motorName]) => motorName !== 'feeder') // Exclude feeder for now
+                .map(([motorName, [minSpeed, maxSpeed]]) => {
+                    const speed = Math.floor(Math.random() * (maxSpeed - minSpeed + 1)) + minSpeed;
+                    return { motorName, speed };
+                });
+
+            // Send updates for the other motors
             await fetch('/api/motor/commands', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(motorUpdates),
+            });
+
+            // Step 3: Introduce a delay before updating the feeder motor
+            await delay(1000); // Adjust as needed.
+
+            // Step 4: Update the feeder motor after delay
+            const [feederMinSpeed, feederMaxSpeed] = this.motors.feeder;
+            const feederSpeed = Math.floor(Math.random() * (feederMaxSpeed - feederMinSpeed + 1)) + feederMinSpeed;
+
+            // Send the update for the feeder motor
+            await fetch('/api/motor/commands', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify([{ motorName: 'feeder', speed: feederSpeed }]),
             });
         },
         async stopMotors() {
@@ -57,7 +87,7 @@ export const useMotorStore = defineStore('motor', {
     getters: {
         getMotorState: (state) => (motorName: string) => {
             // Return default array if motorName not found
-            return state.motors[motorName] || [-100, 100]
+            return state.motors[motorName] || [-100, 100];
         }
     }
-})
+});
